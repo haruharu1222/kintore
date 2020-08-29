@@ -23,8 +23,8 @@ class Graph: UIView {
     var memoriMargin: CGFloat = 70 //横目盛の間隔
     var graphHeight: CGFloat = 400 //グラフの高さ
     var graphPoints: [String] = []
-    var graphDatas: [CGFloat] = []
-
+    var graphDatas: [CGFloat] = [0,0,0,0,0,0,0]
+    var i_graghDatas: [Int] = []
     
     // UseDefaultsのインスタンスを生成
     let userDefaults = UserDefaults.standard
@@ -36,10 +36,21 @@ class Graph: UIView {
     
     func drawLineGraph()
     {
+        let ud = UserDefaults.standard
         
         graphPoints = ["2000/2/3", "2000/3/3", "2000/4/3", "2000/5/3", "2000/6/3", "2000/7/3", "2000/8/3"]
-        graphDatas = [100, 30, 10, -50, 90, 12, 40]
+        i_graghDatas = [100, 30, 10, -50, 90, 12, 40]
+        
 
+        
+        for i in 0...6 {
+            let data_hairetu = ud.array(forKey: "\(i)") as! [String]
+            graphPoints[i] = data_hairetu[0]
+            i_graghDatas[i] = Int(atof(data_hairetu[1]))
+            graphDatas[i] = CGFloat(i_graghDatas[i])
+        }
+    
+        
         GraphFrame()
         MemoriGraphDraw()
     }

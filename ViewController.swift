@@ -24,7 +24,7 @@ extension UIViewController {
 
 
 //ユーザーデフォルトにデータを保存
-///日付：体重，体脂肪
+///ID：日付，体重，体脂肪
 
 
 
@@ -88,14 +88,13 @@ class ViewController: UIViewController, UITextFieldDelegate {
         dateFormatter.dateFormat = DateFormatter.dateFormat(fromTemplate: "yMMMd", options: 0, locale: Locale(identifier: "ja_JP"))
         today.text = dateFormatter.string(from: dt)
         
-        
+
         let graphPoints = ["2000/2/3", "2000/3/3", "2000/4/3", "2000/5/3", "2000/6/3", "2000/7/3", "2000/8/3"]
-        let graphDatas = [100, 30, 10, -50, 90, 12, 40]
+        let graphDatas = ["100", "30", "10", "-50", "90", "12", "40"]
  
-        ud.set([100],forKey:"2000/2/3")
         
         for i in 0 ... 6{
-            ud.set([graphDatas[i]],forKey: graphPoints[i])
+            ud.set([graphPoints[i],graphDatas[i]], forKey: "\(i)")
         }
         
         
@@ -143,7 +142,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
             }
         }
         
-      let a = ud.array(forKey: "2000/4/3") as! [Int]
+      let a = ud.array(forKey: "3") as! [String]
       today.text = "\(a[0])"
            
            
