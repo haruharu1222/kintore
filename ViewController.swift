@@ -22,6 +22,11 @@ extension UIViewController {
 }
 
 
+//ユーザーデフォルト
+//let ud = UserDefaults(suiteName: "A")!
+let ud = UserDefaults.standard
+
+
 
 //ユーザーデフォルトにデータを保存
 ///ID：日付，体重，体脂肪
@@ -76,7 +81,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
     
     
     override func viewDidLoad() {
-        let ud = UserDefaults.standard
+        //let ud = UserDefaults.standard
        
         hideKeyboardWhenTappedAround()
         taiju_text.delegate = self
@@ -85,7 +90,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
         
         
         
-        dateFormatter.dateFormat = DateFormatter.dateFormat(fromTemplate: "yMMMd", options: 0, locale: Locale(identifier: "ja_JP"))
+        dateFormatter.dateFormat = DateFormatter.dateFormat(fromTemplate: "MMMd", options: 0, locale: Locale(identifier: "ja_JP"))
         today.text = dateFormatter.string(from: dt)
         
 
@@ -97,6 +102,10 @@ class ViewController: UIViewController, UITextFieldDelegate {
             ud.set([graphPoints[i],graphDatas[i]], forKey: "\(i)")
         }
         
+        //var data_length = 8
+        ud.set(8,forKey: "length")
+
+        
         
         super.viewDidLoad()
         // Do any additional setup after loading the view.
@@ -107,15 +116,17 @@ class ViewController: UIViewController, UITextFieldDelegate {
     
     
     
+
+    
     
     
     //体重入力
     @IBAction func taiju_in(_ sender: Any) {
         let input_text = taiju_text.text
-        let ud = UserDefaults.standard
+        //let ud = UserDefaults.standard
         //var tkiroku = kiroku[dateFormatter.string(from: dt)]
 
-        
+/*
         //今日のデータは入力済みで，更新したいのか？そうでないなら，今日用の新たなキーを作成
         if ud.array(forKey: dateFormatter.string(from: dt)) != nil {
             var kiroku = ud.array(forKey: dateFormatter.string(from: dt)) as! [Int]
@@ -144,19 +155,46 @@ class ViewController: UIViewController, UITextFieldDelegate {
         
       let a = ud.array(forKey: "3") as! [String]
       today.text = "\(a[0])"
-           
-           
+*/
+
+
+        var data_length = ud.integer(forKey: "length")
+
+      //ユーザーデフォルトにセット
+        var new_data_hairetu:[String] = []
+        var old_data_hairetu:[String] = []
+        
+        
+        //体重入力されてるか？
+        if input_text != nil{
+            if data_length > 0{
+                old_data_hairetu = ud.array(forKey: "\(data_length - 1)") as! [String]
+                //今日のデータは入力済みで，更新したいのか？そうでないなら，今日用の新たなキーを作成
+                if old_data_hairetu[0] == dateFormatter.string(from: dt){
+                    old_data_hairetu[1] = input_text!
+                    ud.set(old_data_hairetu, forKey: "\(data_length - 1)")
+                }else{
+                    new_data_hairetu += [dateFormatter.string(from: dt)]
+                    new_data_hairetu += [input_text!]
+                    ud.set(new_data_hairetu, forKey: "\(data_length)")
+                    data_length += 1
+                }
+            }else{
+                old_data_hairetu += [dateFormatter.string(from: dt)]
+                old_data_hairetu += [input_text!]
+                ud.set(old_data_hairetu, forKey: "\(data_length - 1)")
+            }
+        }
+        //plistファイルへの出力と同期する。
+        userDefaults.synchronize()
     }
-    
-    
-    
     
     
 
     //体脂肪
     @IBAction func sibo_in(_ sender: Any) {
        let input_text = sibo_text.text
-       let ud = UserDefaults.standard
+       //let ud = UserDefaults.standard
        //var tkiroku = kiroku[dateFormatter.string(from: dt)]
 
       
