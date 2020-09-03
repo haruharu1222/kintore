@@ -23,15 +23,30 @@ class Graph: UIView {
     var memoriMargin: CGFloat = 70 //横目盛の間隔
     var graphHeight: CGFloat = 400 //グラフの高さ
     var graphPoints: [String] = ["1","2","3","4","5","6","7","8"]
-    var graphDatas: [CGFloat] = [0,0,0,0,0,0,0,0]
-    var i_graghDatas: [Int] = [0,0,0,0,0,0,0,0]
+    var graphTaijuDatas: [CGFloat] = [0,0,0,0,0,0,0,0]
+    var graphSiboDatas: [CGFloat] = [0,0,0,0,0,0,0,0]
+    var i_graghTaijuDatas: [Int] = [0,0,0,0,0,0,0,0]
     
     // UseDefaultsのインスタンスを生成
     let userDefaults = UserDefaults.standard
     
     
     
-    
+    // 保持しているDataの中で最大値と最低値の差を求める
+     var yAxisMax: CGFloat {
+         return graphTaijuDatas.max()!-graphTaijuDatas.min()!
+         //return max(graphTaijuDatas.max()!-graphTaijuDatas.min()!,graphSiboDatas.max()!-graphSiboDatas.min()!)
+     }
+
+     //グラフ横幅を算出
+     func checkWidth() -> CGFloat{
+         return CGFloat(graphPoints.count-1) * memoriMargin + (circleWidth * 2)
+     }
+
+     //グラフ縦幅を算出
+     func checkHeight() -> CGFloat{
+         return graphHeight
+     }
     
     
     func drawLineGraph()
@@ -48,8 +63,8 @@ class Graph: UIView {
         for i in 0...ud.integer(forKey: "length")-1 {
             let data_hairetu = ud.array(forKey: "\(i)") as! [String]
             graphPoints[i] = data_hairetu[0]
-            i_graghDatas[i] = Int(atof(data_hairetu[1]))
-            graphDatas[i] = CGFloat(i_graghDatas[i])
+            i_graghTaijuDatas[i] = Int(atof(data_hairetu[1]))
+            graphTaijuDatas[i] = CGFloat(i_graghTaijuDatas[i])
         }
     
         
@@ -101,50 +116,127 @@ class Graph: UIView {
     override func draw(_ rect: CGRect) {
 
         var count:CGFloat = 0
-        let linePath = UIBezierPath()
-        var myCircle = UIBezierPath()
+        let linePath_taiju = UIBezierPath()
+        let linePath_sibo = UIBezierPath()
+        var myCircle_taiju = UIBezierPath()
+        var myCircle_sibo = UIBezierPath()
 
-        linePath.lineWidth = lineWidth
+        linePath_taiju.lineWidth = lineWidth
+        linePath_sibo.lineWidth = lineWidth
         lineColor.setStroke()
 
-        for datapoint in graphDatas {
+        
+      
+        
+        
+        
+        for datapoint in graphTaijuDatas {
 
-            if Int(count+1) < graphDatas.count {
+            if Int(count+1) < graphTaijuDatas.count {
 
-                var nowY: CGFloat = datapoint/yAxisMax * (graphHeight - circleWidth)
-                nowY = graphHeight - nowY
+                var nowY_taiju: CGFloat = datapoint/yAxisMax * (graphHeight - circleWidth)
+                var nowY_sibo: CGFloat = 10
+                nowY_taiju = graphHeight - nowY_taiju
 
-                if(graphDatas.min()!<0){
-                    nowY = (datapoint - graphDatas.min()!)/yAxisMax * (graphHeight - circleWidth)
-                    nowY = graphHeight - nowY
+                if(graphTaijuDatas.min()!<0){
+                    nowY_taiju = (datapoint - graphTaijuDatas.min()!)/yAxisMax * (graphHeight - circleWidth)
+                    nowY_taiju = graphHeight - nowY_taiju
                 }
 
                 //次のポイントを計算
-                var nextY: CGFloat = 0
-                nextY = graphDatas[Int(count+1)]/yAxisMax * (graphHeight - circleWidth)
-                nextY = graphHeight - nextY
+                var nextY_taiju: CGFloat = 0
+                nextY_taiju = graphTaijuDatas[Int(count+1)]/yAxisMax * (graphHeight - circleWidth)
+                nextY_taiju = graphHeight - nextY_taiju
 
-                if(graphDatas.min()!<0){
-                    nextY = (graphDatas[Int(count+1)] - graphDatas.min()!)/yAxisMax * (graphHeight - circleWidth)
-                    nextY = graphHeight - nextY - circleWidth
+                if(graphTaijuDatas.min()!<0){
+                    nextY_taiju = (graphTaijuDatas[Int(count+1)] - graphTaijuDatas.min()!)/yAxisMax * (graphHeight - circleWidth)
+                    nextY_taiju = graphHeight - nextY_taiju - circleWidth
                 }
 
                 //最初の開始地点を指定
                 var circlePoint:CGPoint = CGPoint()
                 if Int(count) == 0 {
-                    linePath.move(to: CGPoint(x: count * memoriMargin + circleWidth, y: nowY))
-                    circlePoint = CGPoint(x: count * memoriMargin + circleWidth, y: nowY)
+                    //体重の初期地点
+                    linePath_taiju.move(to: CGPoint(x: count * memoriMargin + circleWidth, y: nowY_taiju))
+                    circlePoint = CGPoint(x: count * memoriMargin + circleWidth, y: nowY_taiju)
+                    myCircle_taiju = UIBezierPath(arcCenter: circlePoint,radius: circleWidth,startAngle: 0.0,endAngle: CGFloat(Double.pi*2),clockwise: false)
+                    circleColor.setFill()
+                    myCircle_taiju.fill()
+                    myCircle_taiju.stroke()
+                    
+                    //体脂肪の初期地点
+                    linePath_sibo.move(to: CGPoint(x: count * memoriMargin + circleWidth, y: nowY_sibo))
+                    circlePoint = CGPoint(x: count * memoriMargin + circleWidth, y: nowY_sibo)
+                    myCircle_sibo = UIBezierPath(arcCenter: circlePoint,radius: circleWidth,startAngle: 0.0,endAngle: CGFloat(Double.pi*2),clockwise: false)
+                    circleColor.setFill()
+                    myCircle_sibo.fill()
+                    myCircle_sibo.stroke()
+                }
+
+                //描画ポイントを指定
+                linePath_taiju.addLine(to: CGPoint(x: (count+1) * memoriMargin, y: nextY_taiju))
+                linePath_sibo.addLine(to: CGPoint(x: (count+1) * memoriMargin, y: nowY_sibo))
+
+                //体重のための円をつくる
+                circlePoint = CGPoint(x: (count+1) * memoriMargin, y: nextY_taiju)
+                myCircle_taiju = UIBezierPath(arcCenter: circlePoint,
+                    // 半径
+                    radius: circleWidth,
+                    // 初角度
+                    startAngle: 0.0,
+                    // 最終角度
+                    endAngle: CGFloat(Double.pi*2),
+                    // 反時計回り
+                    clockwise: false)
+                circleColor.setFill()
+                myCircle_taiju.fill()
+                myCircle_taiju.stroke()
+                
+  
+                //体脂肪のための円をつくる
+                circlePoint = CGPoint(x: (count+1) * memoriMargin, y: nowY_sibo)
+                myCircle_sibo = UIBezierPath(arcCenter: circlePoint,
+                    // 半径
+                    radius: circleWidth,
+                    // 初角度
+                    startAngle: 0.0,
+                    // 最終角度
+                    endAngle: CGFloat(Double.pi*2),
+                    // 反時計回り
+                    clockwise: false)
+                circleColor.setFill()
+                myCircle_sibo.fill()
+                myCircle_sibo.stroke()
+
+            }
+
+
+            count += 1
+
+        }
+        
+        
+        
+        
+  /*
+        
+        for _ in graphTaijuDatas {
+
+            if Int(count+1) < graphTaijuDatas.count {
+
+
+                //最初の開始地点を指定
+                var circlePoint:CGPoint = CGPoint()
+                if Int(count) == 0 {
                     myCircle = UIBezierPath(arcCenter: circlePoint,radius: circleWidth,startAngle: 0.0,endAngle: CGFloat(Double.pi*2),clockwise: false)
                     circleColor.setFill()
                     myCircle.fill()
                     myCircle.stroke()
                 }
 
-                //描画ポイントを指定
-                linePath.addLine(to: CGPoint(x: (count+1) * memoriMargin, y: nextY))
-
-                //円をつくる
-                circlePoint = CGPoint(x: (count+1) * memoriMargin, y: nextY)
+                //体脂肪のための円をつくる
+                let nextZ: CGFloat = 10
+                circlePoint = CGPoint(x: (count+1) * memoriMargin, y: nextZ)
                 myCircle = UIBezierPath(arcCenter: circlePoint,
                     // 半径
                     radius: circleWidth,
@@ -163,15 +255,17 @@ class Graph: UIView {
             count += 1
 
         }
+*/
 
-        linePath.stroke()
-
-
+        linePath_taiju.stroke()
+        linePath_sibo.stroke()
     }
-
+}
+/*
     // 保持しているDataの中で最大値と最低値の差を求める
     var yAxisMax: CGFloat {
-        return graphDatas.max()!-graphDatas.min()!
+        return graphTaijuDatas.max()!-graphTaijuDatas.min()!
+        //return max(graphTaijuDatas.max()!-graphTaijuDatas.min()!,graphSiboDatas.max()!-graphSiboDatas.min()!)
     }
 
     //グラフ横幅を算出
@@ -183,6 +277,4 @@ class Graph: UIView {
     func checkHeight() -> CGFloat{
         return graphHeight
     }
-
-
-}
+ */
