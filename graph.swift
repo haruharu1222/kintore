@@ -6,6 +6,9 @@
 //  Copyright © 2020 山口遥陽. All rights reserved.
 //
 
+
+
+
 import UIKit
 
 class Graph: UIView {
@@ -26,8 +29,15 @@ class Graph: UIView {
     var graphHeight: CGFloat = 400 //グラフの高さ
     var graphPoints: [String] = ["1","2","3","4","5","6","7","8"]
     var graphTaijuDatas: [CGFloat] = [0,0,0,0,0,0,0,0]
-    var graphSiboDatas: [CGFloat] = [20, 100, 50, 130, 22, 25, 12,100]
+    var graphSiboDatas: [CGFloat] = [0,0,0,0,0,0,0,0]
     var i_graghTaijuDatas: [Int] = [0,0,0,0,0,0,0,0]
+    var i_graghSiboDatas: [Int] = [0,0,0,0,0,0,0,0]
+    
+    /*
+     データの値が１０００だった場合，入力されていないとして，その部分はグラフが空白になるようにします．
+     */
+    
+    
     
     // UseDefaultsのインスタンスを生成
     let userDefaults = UserDefaults.standard
@@ -66,7 +76,9 @@ class Graph: UIView {
             let data_hairetu = ud.array(forKey: "\(i)") as! [String]
             graphPoints[i] = data_hairetu[0]
             i_graghTaijuDatas[i] = Int(atof(data_hairetu[1]))
+            i_graghSiboDatas[i] = Int(atof(data_hairetu[2]))
             graphTaijuDatas[i] = CGFloat(i_graghTaijuDatas[i])
+            graphSiboDatas[i] = CGFloat(i_graghSiboDatas[i])
         }
     
         
@@ -134,9 +146,13 @@ class Graph: UIView {
         lineColor_taiju.setStroke()
         //体重のグラフ描写
         for datapoint in graphTaijuDatas {
-
+            //空白点
+            if datapoint == 1000 {
+                continue
+            }
+            
             if Int(count_taiju+1) < graphTaijuDatas.count {
-
+                
                 var nowY_taiju: CGFloat = datapoint/yAxisMax * (graphHeight - circleWidth)
                 nowY_taiju = graphHeight - nowY_taiju
 
@@ -145,6 +161,14 @@ class Graph: UIView {
                     nowY_taiju = graphHeight - nowY_taiju
                 }
 
+    
+                //空白点
+                if graphTaijuDatas[Int(count_taiju+1)] == 1000 {
+                   continue
+               }
+                
+                
+                
                 //次のポイントを計算
                 var nextY_taiju: CGFloat = 0
                 nextY_taiju = graphTaijuDatas[Int(count_taiju+1)]/yAxisMax * (graphHeight - circleWidth)
@@ -198,63 +222,74 @@ class Graph: UIView {
         lineColor_sibo.setStroke()
         //体脂肪のグラフ描写
         for datapoint in graphSiboDatas {
+            //空白点
+            if datapoint == 1000 {
+                continue
+            }
+            
+            if Int(count_sibo+1) < graphSiboDatas.count {
 
-                  if Int(count_sibo+1) < graphSiboDatas.count {
+                var nowY_sibo: CGFloat = datapoint/yAxisMax * (graphHeight - circleWidth)
+                nowY_sibo = graphHeight - nowY_sibo
 
-                      var nowY_sibo: CGFloat = datapoint/yAxisMax * (graphHeight - circleWidth)
-                      nowY_sibo = graphHeight - nowY_sibo
+                if(graphTaijuDatas.min()!<0){
+                    nowY_sibo = (datapoint - graphSiboDatas.min()!)/yAxisMax * (graphHeight - circleWidth)
+                    nowY_sibo = graphHeight - nowY_sibo
+                }
 
-                      if(graphTaijuDatas.min()!<0){
-                          nowY_sibo = (datapoint - graphSiboDatas.min()!)/yAxisMax * (graphHeight - circleWidth)
-                          nowY_sibo = graphHeight - nowY_sibo
-                      }
+                
+                //空白点
+                if graphSiboDatas[Int(count_sibo+1)] == 1000 {
+                    continue
+                }
+                
+                
+                //次のポイントを計算
+                var nextY_sibo: CGFloat = 0
+                nextY_sibo = graphSiboDatas[Int(count_sibo+1)]/yAxisMax * (graphHeight - circleWidth)
+                nextY_sibo = graphHeight - nextY_sibo
 
-                      //次のポイントを計算
-                      var nextY_sibo: CGFloat = 0
-                      nextY_sibo = graphSiboDatas[Int(count_sibo+1)]/yAxisMax * (graphHeight - circleWidth)
-                      nextY_sibo = graphHeight - nextY_sibo
+                if(graphSiboDatas.min()!<0){
+                    nextY_sibo = (graphSiboDatas[Int(count_sibo+1)] - graphSiboDatas.min()!)/yAxisMax * (graphHeight - circleWidth)
+                    nextY_sibo = graphHeight - nextY_sibo - circleWidth
+                }
 
-                      if(graphSiboDatas.min()!<0){
-                          nextY_sibo = (graphSiboDatas[Int(count_sibo+1)] - graphSiboDatas.min()!)/yAxisMax * (graphHeight - circleWidth)
-                          nextY_sibo = graphHeight - nextY_sibo - circleWidth
-                      }
+                //最初の開始地点を指定
+                var circlePoint:CGPoint = CGPoint()
+                if Int(count_sibo) == 0 {
+                    //体脂肪の初期地点
+                    linePath_sibo.move(to: CGPoint(x: count_sibo * memoriMargin + circleWidth, y: nowY_sibo))
+                    circlePoint = CGPoint(x: count_sibo * memoriMargin + circleWidth, y: nowY_sibo)
+                    myCircle_sibo = UIBezierPath(arcCenter: circlePoint,radius: circleWidth,startAngle: 0.0,endAngle: CGFloat(Double.pi*2),clockwise: false)
+                    circleColor_sibo.setFill()
+                    myCircle_sibo.fill()
+                    myCircle_sibo.stroke()
+                }
+                
+                //描画ポイントを指定
+                linePath_sibo.addLine(to: CGPoint(x: (count_sibo+1) * memoriMargin, y: nextY_sibo))
 
-                      //最初の開始地点を指定
-                      var circlePoint:CGPoint = CGPoint()
-                      if Int(count_sibo) == 0 {
-                          //体脂肪の初期地点
-                          linePath_sibo.move(to: CGPoint(x: count_sibo * memoriMargin + circleWidth, y: nowY_sibo))
-                          circlePoint = CGPoint(x: count_sibo * memoriMargin + circleWidth, y: nowY_sibo)
-                          myCircle_sibo = UIBezierPath(arcCenter: circlePoint,radius: circleWidth,startAngle: 0.0,endAngle: CGFloat(Double.pi*2),clockwise: false)
-                          circleColor_sibo.setFill()
-                          myCircle_sibo.fill()
-                          myCircle_sibo.stroke()
-                      }
+  
+                //体脂肪のための円をつくる
+                circlePoint = CGPoint(x: (count_sibo+1) * memoriMargin, y: nextY_sibo)
+                myCircle_sibo = UIBezierPath(arcCenter: circlePoint,
+                    // 半径
+                    radius: circleWidth,
+                    // 初角度
+                    startAngle: 0.0,
+                    // 最終角度
+                    endAngle: CGFloat(Double.pi*2),
+                    // 反時計回り
+                    clockwise: false)
+                circleColor_sibo.setFill()
+                myCircle_sibo.fill()
+                myCircle_sibo.stroke()
 
-                      //描画ポイントを指定
-                      linePath_sibo.addLine(to: CGPoint(x: (count_sibo+1) * memoriMargin, y: nextY_sibo))
+            }
 
-      
-                      //体脂肪のための円をつくる
-                      circlePoint = CGPoint(x: (count_sibo+1) * memoriMargin, y: nextY_sibo)
-                      myCircle_sibo = UIBezierPath(arcCenter: circlePoint,
-                          // 半径
-                          radius: circleWidth,
-                          // 初角度
-                          startAngle: 0.0,
-                          // 最終角度
-                          endAngle: CGFloat(Double.pi*2),
-                          // 反時計回り
-                          clockwise: false)
-                      circleColor_sibo.setFill()
-                      myCircle_sibo.fill()
-                      myCircle_sibo.stroke()
+            count_sibo += 1
 
-                  }
-
-                  count_sibo += 1
-
-              }
+        }
    
         lineColor_taiju.setStroke()
         linePath_taiju.stroke()

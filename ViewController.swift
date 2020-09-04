@@ -49,6 +49,9 @@ class ViewController: UIViewController, UITextFieldDelegate {
     // UseDefaultsのインスタンスを生成
     let userDefaults = UserDefaults.standard
     
+    //入力がない
+    let notin:Int = 1000
+    
     
 
     @IBAction func unwindToTop(segue: UIStoryboardSegue) {
@@ -99,11 +102,11 @@ class ViewController: UIViewController, UITextFieldDelegate {
  
         
         for i in 0 ... 6{
-            ud.set([graphPoints[i],graphDatas[i]], forKey: "\(i)")
+            ud.set([graphPoints[i],graphDatas[i],graphDatas[i]], forKey: "\(i)")
         }
         
-        //var data_length = 8
-        ud.set(8,forKey: "length")
+        //var data_length = 7
+        ud.set(7,forKey: "length")
 
         
         
@@ -123,44 +126,10 @@ class ViewController: UIViewController, UITextFieldDelegate {
     //体重入力
     @IBAction func taiju_in(_ sender: Any) {
         let input_text = taiju_text.text
-        //let ud = UserDefaults.standard
-        //var tkiroku = kiroku[dateFormatter.string(from: dt)]
-
-/*
-        //今日のデータは入力済みで，更新したいのか？そうでないなら，今日用の新たなキーを作成
-        if ud.array(forKey: dateFormatter.string(from: dt)) != nil {
-            var kiroku = ud.array(forKey: dateFormatter.string(from: dt)) as! [Int]
-            
-            //体重入力されてるか？
-            if input_text != nil{
-                //体重も体脂肪も入力済みのとき
-                if kiroku.count == 2{
-                    kiroku[0] = Int(input_text!)!
-                }else{
-                    let tmp = kiroku[0]
-                    kiroku[0] = Int(input_text!)!
-                    kiroku += [tmp]
-                }
-            }
-            ud.set(kiroku,forKey: dateFormatter.string(from: dt))
-        }else{
-            var new_kiroku :[Int] = []
-            //nilを強制アンラップはエラーが出るから
-            if input_text != nil{
-                //inputtextはoptional型だから強制アンラップ
-                new_kiroku += [Int(input_text!)!]
-                ud.set(new_kiroku, forKey: dateFormatter.string(from: dt))
-            }
-        }
         
-      let a = ud.array(forKey: "3") as! [String]
-      today.text = "\(a[0])"
-*/
-
-
         var data_length = ud.integer(forKey: "length")
 
-      //ユーザーデフォルトにセット
+        //ユーザーデフォルトにセット
         var new_data_hairetu:[String] = []
         var old_data_hairetu:[String] = []
         
@@ -176,13 +145,18 @@ class ViewController: UIViewController, UITextFieldDelegate {
                 }else{
                     new_data_hairetu += [dateFormatter.string(from: dt)]
                     new_data_hairetu += [input_text!]
+                    new_data_hairetu += ["\(notin)"]
                     ud.set(new_data_hairetu, forKey: "\(data_length)")
                     data_length += 1
+                    ud.set(data_length,forKey: "length")
                 }
             }else{
                 old_data_hairetu += [dateFormatter.string(from: dt)]
                 old_data_hairetu += [input_text!]
+                old_data_hairetu += ["\(notin)"]
                 ud.set(old_data_hairetu, forKey: "\(data_length - 1)")
+                data_length += 1
+                ud.set(data_length,forKey: "length")
             }
         }
         //plistファイルへの出力と同期する。
@@ -190,14 +164,61 @@ class ViewController: UIViewController, UITextFieldDelegate {
     }
     
     
+    
+    
 
     //体脂肪
     @IBAction func sibo_in(_ sender: Any) {
-       let input_text = sibo_text.text
-       //let ud = UserDefaults.standard
-       //var tkiroku = kiroku[dateFormatter.string(from: dt)]
+        let input_text = sibo_text.text
+        //let ud = UserDefaults.standard
+        //var tkiroku = kiroku[dateFormatter.string(from: dt)]
+        var data_length = ud.integer(forKey: "length")
 
       
+        
+        
+        //ユーザーデフォルトにセット
+        var new_data_hairetu:[String] = []
+        var old_data_hairetu:[String] = []
+        
+        
+        //体脂肪入力されてるか？
+        if input_text != nil{
+            if data_length > 0{
+                old_data_hairetu = ud.array(forKey: "\(data_length - 1)") as! [String]
+                //今日のデータは入力済みで，更新したいのか？そうでないなら，今日用の新たなキーを作成
+                if old_data_hairetu[0] == dateFormatter.string(from: dt){
+                    old_data_hairetu[2] = input_text!
+                    ud.set(old_data_hairetu, forKey: "\(data_length - 1)")
+                }else{
+                    new_data_hairetu += [dateFormatter.string(from: dt)]
+                    new_data_hairetu += ["\(notin)"]
+                    new_data_hairetu += [input_text!]
+                    ud.set(new_data_hairetu, forKey: "\(data_length)")
+                    data_length += 1
+                    ud.set(data_length,forKey: "length")
+                }
+            }else{
+                old_data_hairetu += [dateFormatter.string(from: dt)]
+                old_data_hairetu += ["\(notin)"]
+                old_data_hairetu += [input_text!]
+                ud.set(old_data_hairetu, forKey: "\(data_length - 1)")
+                data_length += 1
+                ud.set(data_length,forKey: "length")
+            }
+        }
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
        //今日のデータは入力済みで，更新したいのか？そうでないなら，今日用の新たなキーを作成
        if ud.array(forKey: dateFormatter.string(from: dt)) != nil {
            var kiroku = ud.array(forKey: dateFormatter.string(from: dt)) as! [Int]
@@ -208,12 +229,13 @@ class ViewController: UIViewController, UITextFieldDelegate {
            }
            ud.set(kiroku,forKey: dateFormatter.string(from: dt))
        }else{
-           var new_kiroku :[Int] = []
+           var new_kiroku :[String] = []
            //nilを強制アンラップはエラーが出るから
            if input_text != nil{
                //inputtextはoptional型だから強制アンラップ
-               new_kiroku += [Int(input_text!)!]
-               ud.set(new_kiroku, forKey: dateFormatter.string(from: dt))
+               new_kiroku += [dateFormatter.string(from: dt)]
+               new_kiroku += [input_text!]
+               ud.set(new_kiroku,forKey: "\(data_length - 1)")
            }
        }
     }
