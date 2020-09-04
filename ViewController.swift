@@ -106,7 +106,11 @@ class ViewController: UIViewController, UITextFieldDelegate {
         }
         
         //var data_length = 7
-        ud.set(7,forKey: "length")
+        //ud.set(7,forKey: "length")
+        
+        if ud.object(forKey: "length") == nil {
+            ud.set(7,forKey: "length")
+        }
 
         
         
@@ -207,60 +211,8 @@ class ViewController: UIViewController, UITextFieldDelegate {
                 ud.set(data_length,forKey: "length")
             }
         }
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-       //今日のデータは入力済みで，更新したいのか？そうでないなら，今日用の新たなキーを作成
-       if ud.array(forKey: dateFormatter.string(from: dt)) != nil {
-           var kiroku = ud.array(forKey: dateFormatter.string(from: dt)) as! [Int]
-          
-           //体脂肪入力されてるか？
-           if input_text != nil{
-               kiroku += [Int(input_text!)!]
-           }
-           ud.set(kiroku,forKey: dateFormatter.string(from: dt))
-       }else{
-           var new_kiroku :[String] = []
-           //nilを強制アンラップはエラーが出るから
-           if input_text != nil{
-               //inputtextはoptional型だから強制アンラップ
-               new_kiroku += [dateFormatter.string(from: dt)]
-               new_kiroku += [input_text!]
-               ud.set(new_kiroku,forKey: "\(data_length - 1)")
-           }
-       }
-    }
-}
-/*
-       if ud.kirokus(forKey: dateFormatter.string(from: dt)) != nil{
-           tkiroku = [taiju_text.text!]
-       }
-
-       today.text = tkiroku![0]
-       
-       
-       if kiroku! == []{
-            UserDefaults.standard.kirokus = [dateFormatter.string(from: dt): [taiju_text.text!]]
-       }else{
-           if kiroku!.count == 2{
-               kiroku![0] = taiju_text.text!
-           }else{
-               let tmp:String = kiroku![0]
-               kiroku![0] = taiju_text.text!
-               kiroku! += [tmp]
-           }
-       }
-       
-       UserDefaults.standard.kirokus[dateFormatter.string(from: dt)] = kiroku
-
+        //plistファイルへの出力と同期する。
+        userDefaults.synchronize()
    }
- */
+}
+    
