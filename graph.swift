@@ -27,20 +27,15 @@ class Graph: UIView {
 
     var memoriMargin: CGFloat = 70 //横目盛の間隔
     var graphHeight: CGFloat = 400 //グラフの高さ
-    var graphPoints: [String] = ["1","2","3","4","5","6","7","8"]
-    var graphTaijuDatas: [CGFloat] = [0,0,0,0,0,0,0,0]
-    var graphSiboDatas: [CGFloat] = [0,0,0,0,0,0,0,0]
-    var i_graghTaijuDatas: [Int] = [0,0,0,0,0,0,0,0]
-    var i_graghSiboDatas: [Int] = [0,0,0,0,0,0,0,0]
+    var graphPoints: [String] = []
+    var graphTaijuDatas: [CGFloat] = []
+    var graphSiboDatas: [CGFloat] = []
     
     /*
      データの値が１０００だった場合，入力されていないとして，その部分はグラフが空白になるようにします．
      */
     
     
-    
-    // UseDefaultsのインスタンスを生成
-    let userDefaults = UserDefaults.standard
     
     
     
@@ -64,21 +59,14 @@ class Graph: UIView {
     func drawLineGraph()
     {
         let ud = UserDefaults.standard
-        //ユーザーデフォルト
-        //let ud = UserDefaults(suiteName: "A")!
-        
-        //graphPoints = ["2000/2/3", "2000/3/3", "2000/4/3", "2000/5/3", "2000/6/3", "2000/7/3", "2000/8/3"]
-        //i_graghDatas = [100, 30, 10, -50, 90, 12, 40]
-        
+
 
         
-        for i in 0...ud.integer(forKey: "length")-1 {
+        for i in 0...ud.integer(forKey: "length") {
             let data_hairetu = ud.array(forKey: "\(i)") as! [String]
-            graphPoints[i] = data_hairetu[0]
-            i_graghTaijuDatas[i] = Int(atof(data_hairetu[1]))
-            i_graghSiboDatas[i] = Int(atof(data_hairetu[2]))
-            graphTaijuDatas[i] = CGFloat(i_graghTaijuDatas[i])
-            graphSiboDatas[i] = CGFloat(i_graghSiboDatas[i])
+            graphPoints += [data_hairetu[0]]
+            graphTaijuDatas += [CGFloat(Int(atof(data_hairetu[1])))]
+            graphSiboDatas += [CGFloat(Int(atof(data_hairetu[2])))]
         }
     
         

@@ -99,20 +99,21 @@ class ViewController: UIViewController, UITextFieldDelegate {
 
         let graphPoints = ["2000/2/3", "2000/3/3", "2000/4/3", "2000/5/3", "2000/6/3", "2000/7/3", "2000/8/3"]
         let graphDatas = ["100", "30", "10", "-50", "90", "12", "40"]
+        var date_length:Int = 0
  
         
         for i in 0 ... 6{
             ud.set([graphPoints[i],graphDatas[i],graphDatas[i]], forKey: "\(i)")
-        }
-        
-        //var data_length = 7
-        //ud.set(7,forKey: "length")
-        
-        if ud.object(forKey: "length") == nil {
-            ud.set(7,forKey: "length")
+            if i == 0{
+                date_length = 0
+            }else{
+                date_length += 1
+            }
         }
 
-        
+        if ud.object(forKey: "length") == nil {
+            ud.set(date_length,forKey: "length")
+        }
         
         super.viewDidLoad()
         // Do any additional setup after loading the view.
@@ -140,17 +141,17 @@ class ViewController: UIViewController, UITextFieldDelegate {
         
         //体重入力されてるか？
         if input_text != nil{
-            if data_length > 0{
-                old_data_hairetu = ud.array(forKey: "\(data_length - 1)") as! [String]
+            if data_length >= 0{
+                old_data_hairetu = ud.array(forKey: "\(data_length)") as! [String]
                 //今日のデータは入力済みで，更新したいのか？そうでないなら，今日用の新たなキーを作成
                 if old_data_hairetu[0] == dateFormatter.string(from: dt){
                     old_data_hairetu[1] = input_text!
-                    ud.set(old_data_hairetu, forKey: "\(data_length - 1)")
+                    ud.set(old_data_hairetu, forKey: "\(data_length)")
                 }else{
                     new_data_hairetu += [dateFormatter.string(from: dt)]
                     new_data_hairetu += [input_text!]
                     new_data_hairetu += ["\(notin)"]
-                    ud.set(new_data_hairetu, forKey: "\(data_length)")
+                    ud.set(new_data_hairetu, forKey: "\(data_length + 1)")
                     data_length += 1
                     ud.set(data_length,forKey: "length")
                 }
@@ -158,8 +159,8 @@ class ViewController: UIViewController, UITextFieldDelegate {
                 old_data_hairetu += [dateFormatter.string(from: dt)]
                 old_data_hairetu += [input_text!]
                 old_data_hairetu += ["\(notin)"]
-                ud.set(old_data_hairetu, forKey: "\(data_length - 1)")
-                data_length += 1
+                ud.set(old_data_hairetu, forKey: "0")
+                data_length = 0
                 ud.set(data_length,forKey: "length")
             }
         }
@@ -189,16 +190,16 @@ class ViewController: UIViewController, UITextFieldDelegate {
         //体脂肪入力されてるか？
         if input_text != nil{
             if data_length > 0{
-                old_data_hairetu = ud.array(forKey: "\(data_length - 1)") as! [String]
+                old_data_hairetu = ud.array(forKey: "\(data_length)") as! [String]
                 //今日のデータは入力済みで，更新したいのか？そうでないなら，今日用の新たなキーを作成
                 if old_data_hairetu[0] == dateFormatter.string(from: dt){
                     old_data_hairetu[2] = input_text!
-                    ud.set(old_data_hairetu, forKey: "\(data_length - 1)")
+                    ud.set(old_data_hairetu, forKey: "\(data_length)")
                 }else{
                     new_data_hairetu += [dateFormatter.string(from: dt)]
                     new_data_hairetu += ["\(notin)"]
                     new_data_hairetu += [input_text!]
-                    ud.set(new_data_hairetu, forKey: "\(data_length)")
+                    ud.set(new_data_hairetu, forKey: "\(data_length + 1)")
                     data_length += 1
                     ud.set(data_length,forKey: "length")
                 }
@@ -206,8 +207,8 @@ class ViewController: UIViewController, UITextFieldDelegate {
                 old_data_hairetu += [dateFormatter.string(from: dt)]
                 old_data_hairetu += ["\(notin)"]
                 old_data_hairetu += [input_text!]
-                ud.set(old_data_hairetu, forKey: "\(data_length - 1)")
-                data_length += 1
+                ud.set(old_data_hairetu, forKey: "0")
+                data_length = 0
                 ud.set(data_length,forKey: "length")
             }
         }
