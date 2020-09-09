@@ -43,11 +43,8 @@ class graphViewController: UIViewController {
         //今日の日付取得
         dateFormatter.dateFormat = DateFormatter.dateFormat(fromTemplate: "MMMd", options: 0, locale: Locale(identifier: "ja_JP"))
         
-        
         let new_key = ud.integer(forKey: "length")
         let pre_key = new_key - 1
-        
-        
         
         if pre_key < 0{
             ratio_taiju.text = "-"
@@ -63,14 +60,21 @@ class graphViewController: UIViewController {
                 if new_data_hairetu[1] == "\(notin)" || pre_data_hairetu[1] == "\(notin)" || new_data_hairetu[1] == "" || pre_data_hairetu[1] == ""{
                     ratio_taiju.text = "-"
                 }else{
-                    ratio_taiju.text = "\(r_taiju)"
-                    //ratio_taiju.text = "\(Int(atof(pre_data_hairetu[1])))"
+                    if r_taiju > 0{
+                        ratio_taiju.text = "+\(r_taiju)"
+                    }else{
+                        ratio_taiju.text = "\(r_taiju)"
+                    }
                 }
                 
-                if new_data_hairetu[2] == "\(notin)" || pre_data_hairetu[2] == "\(notin)" || new_data_hairetu[2] == "0" || pre_data_hairetu[2] == "0"{
+                if new_data_hairetu[2] == "\(notin)" || pre_data_hairetu[2] == "\(notin)" || new_data_hairetu[2] == "" || pre_data_hairetu[2] == ""{
                     ratio_sibo.text="-"
                 }else{
-                    ratio_sibo.text = "\(r_sibo)"
+                    if r_sibo > 0{
+                        ratio_sibo.text = "+\(r_sibo)"
+                    }else{
+                        ratio_sibo.text = "\(r_sibo)"
+                    }
                 }
             }else{
                 ratio_taiju.text = "-"

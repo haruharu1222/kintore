@@ -97,13 +97,14 @@ class ViewController: UIViewController, UITextFieldDelegate {
         today.text = dateFormatter.string(from: dt)
         
 
-        let graphPoints = ["2000/2/3", "2000/3/3", "2000/4/3", "2000/5/3", "2000/6/3", "2000/7/3", "2000/8/3"]
-        let graphDatas = ["100", "30", "10", "-50", "90", "12", "40"]
+        let graphPoints = ["2月3日", "3月3日", "4月3日", "5月3日", "6月3日", "7月3日", "8月3日"]
+        let graphTaijuDatas = ["100", "94", "80", "89", "81", "72", "80"]
+        let graphSiboDatas = ["40", "100", "38", "1000", "31", "22", "30"]
         var date_length:Int = 0
  
         
         for i in 0 ... 6{
-            ud.set([graphPoints[i],graphDatas[i],graphDatas[i]], forKey: "\(i)")
+            ud.set([graphPoints[i],graphTaijuDatas[i],graphSiboDatas[i]], forKey: "\(i)")
             if i == 0{
                 date_length = 0
             }else{

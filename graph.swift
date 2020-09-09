@@ -8,8 +8,19 @@
 
 
 
-
 import UIKit
+
+
+//配列拡張　値を指定すると，その値を削除
+extension Array where Element: Equatable {
+    mutating func remove(value: Element) {
+        if let i = self.firstIndex(of: value) {
+            self.remove(at: i)
+        }
+    }
+}
+
+
 
 class Graph: UIView {
 
@@ -30,6 +41,7 @@ class Graph: UIView {
     var graphPoints: [String] = []
     var graphTaijuDatas: [CGFloat] = []
     var graphSiboDatas: [CGFloat] = []
+
     
     /*
      データの値が１０００だった場合，入力されていないとして，その部分はグラフが空白になるようにします．
@@ -41,8 +53,12 @@ class Graph: UIView {
     
     // 保持しているDataの中で最大値と最低値の差を求める
      var yAxisMax: CGFloat {
-         //return graphTaijuDatas.max()!-graphTaijuDatas.min()!
-         return max(graphTaijuDatas.max()!-graphTaijuDatas.min()!,graphSiboDatas.max()!-graphSiboDatas.min()!)
+         //return max(graphTaijuDatas.max()!-graphTaijuDatas.min()!,graphSiboDatas.max()!-graphSiboDatas.min()!)
+         var a = graphTaijuDatas
+         var b = graphSiboDatas
+         a.remove(value: 1000)
+         b.remove(value: 1000)
+         return max(a.max()!+10,b.max()!+10)
      }
 
      //グラフ横幅を算出
@@ -120,7 +136,7 @@ class Graph: UIView {
         var count_taiju:CGFloat = 0
         var count_sibo:CGFloat = 0
         let linePath_taiju = UIBezierPath()
-        let linePath_sibo = UIBezierPath()
+        var linePath_sibo = UIBezierPath()
         var myCircle_taiju = UIBezierPath()
         var myCircle_sibo = UIBezierPath()
 
@@ -201,6 +217,8 @@ class Graph: UIView {
             count_taiju += 1
             
         }
+        lineColor_taiju.setStroke()
+        linePath_taiju.stroke()
         
 
         
@@ -210,10 +228,49 @@ class Graph: UIView {
         lineColor_sibo.setStroke()
         //体脂肪のグラフ描写
         for datapoint in graphSiboDatas {
+            
+            
             //空白点
             if datapoint == 1000 {
+                lineColor_sibo.setStroke()
+                linePath_sibo.stroke()
+                linePath_sibo = UIBezierPath()
+                
+                
+/********************************************************
+                if graphSiboDatas[Int(count_sibo+1)] == 1000 {
+                    continue
+                }
+                               
+               //次のポイントを計算
+               var nextY_sibo: CGFloat = 0
+               nextY_sibo = graphSiboDatas[Int(count_sibo+1)]/yAxisMax * (graphHeight - circleWidth)
+               nextY_sibo = graphHeight - nextY_sibo
+
+               if(graphSiboDatas.min()!<0){
+                   nextY_sibo = (graphSiboDatas[Int(count_sibo+1)] - graphSiboDatas.min()!)/yAxisMax * (graphHeight - circleWidth)
+                   nextY_sibo = graphHeight - nextY_sibo - circleWidth
+               }
+               
+               //描画ポイントを指定
+               linePath_sibo.addLine(to: CGPoint(x: (count_sibo+1) * memoriMargin, y: nextY_sibo))
+
+ 
+               //体脂肪のための円をつくる
+               let circlePoint = CGPoint(x: (count_sibo+1) * memoriMargin, y: nextY_sibo)
+               myCircle_sibo = UIBezierPath(arcCenter: circlePoint, radius: circleWidth, startAngle: 0.0, endAngle: CGFloat(Double.pi*2), clockwise: false)
+               circleColor_sibo.setFill()
+               myCircle_sibo.fill()
+               myCircle_sibo.stroke()
+ **********************************************************/
+
                 continue
             }
+            
+           
+            
+            
+            
             
             if Int(count_sibo+1) < graphSiboDatas.count {
 
@@ -224,24 +281,7 @@ class Graph: UIView {
                     nowY_sibo = (datapoint - graphSiboDatas.min()!)/yAxisMax * (graphHeight - circleWidth)
                     nowY_sibo = graphHeight - nowY_sibo
                 }
-
                 
-                //空白点
-                if graphSiboDatas[Int(count_sibo+1)] == 1000 {
-                    continue
-                }
-                
-                
-                //次のポイントを計算
-                var nextY_sibo: CGFloat = 0
-                nextY_sibo = graphSiboDatas[Int(count_sibo+1)]/yAxisMax * (graphHeight - circleWidth)
-                nextY_sibo = graphHeight - nextY_sibo
-
-                if(graphSiboDatas.min()!<0){
-                    nextY_sibo = (graphSiboDatas[Int(count_sibo+1)] - graphSiboDatas.min()!)/yAxisMax * (graphHeight - circleWidth)
-                    nextY_sibo = graphHeight - nextY_sibo - circleWidth
-                }
-
                 //最初の開始地点を指定
                 var circlePoint:CGPoint = CGPoint()
                 if Int(count_sibo) == 0 {
@@ -254,21 +294,33 @@ class Graph: UIView {
                     myCircle_sibo.stroke()
                 }
                 
+                
+                
+                
+                if graphSiboDatas[Int(count_sibo+1)] == 1000 {
+                    continue
+                }
+                
+                
+                
+                
+                //次のポイントを計算
+                var nextY_sibo: CGFloat = 0
+                nextY_sibo = graphSiboDatas[Int(count_sibo+1)]/yAxisMax * (graphHeight - circleWidth)
+                nextY_sibo = graphHeight - nextY_sibo
+
+                if(graphSiboDatas.min()!<0){
+                    nextY_sibo = (graphSiboDatas[Int(count_sibo+1)] - graphSiboDatas.min()!)/yAxisMax * (graphHeight - circleWidth)
+                    nextY_sibo = graphHeight - nextY_sibo - circleWidth
+                }
+                
                 //描画ポイントを指定
                 linePath_sibo.addLine(to: CGPoint(x: (count_sibo+1) * memoriMargin, y: nextY_sibo))
 
   
                 //体脂肪のための円をつくる
                 circlePoint = CGPoint(x: (count_sibo+1) * memoriMargin, y: nextY_sibo)
-                myCircle_sibo = UIBezierPath(arcCenter: circlePoint,
-                    // 半径
-                    radius: circleWidth,
-                    // 初角度
-                    startAngle: 0.0,
-                    // 最終角度
-                    endAngle: CGFloat(Double.pi*2),
-                    // 反時計回り
-                    clockwise: false)
+                myCircle_sibo = UIBezierPath(arcCenter: circlePoint, radius: circleWidth, startAngle: 0.0, endAngle: CGFloat(Double.pi*2), clockwise: false)
                 circleColor_sibo.setFill()
                 myCircle_sibo.fill()
                 myCircle_sibo.stroke()
@@ -278,9 +330,6 @@ class Graph: UIView {
             count_sibo += 1
 
         }
-   
-        lineColor_taiju.setStroke()
-        linePath_taiju.stroke()
         lineColor_sibo.setStroke()
         linePath_sibo.stroke()
     }
