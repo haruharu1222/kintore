@@ -13,10 +13,7 @@ class graphViewController: UIViewController {
     
     @IBOutlet weak var ratio_taiju: UILabel!
     @IBOutlet weak var ratio_sibo: UILabel!
-    @IBOutlet weak var scview: UIScrollView!
-    //storyboardでスクロールビューを配置しているので接続
-    
-    
+    @IBOutlet weak var scview: UIScrollView! //storyboardでスクロールビューを配置しているので接続
     
     
     

@@ -23,14 +23,10 @@ extension UIViewController {
 
 
 //ユーザーデフォルト
-//let ud = UserDefaults(suiteName: "A")!
 let ud = UserDefaults.standard
-
-
-
 //ユーザーデフォルトにデータを保存
-///ID：日付，体重，体脂肪
-
+///データの長さ
+///辞書型[key : 何番目のデータか　：　value : 配列[日付，体重，体脂肪]]
 
 
 
@@ -69,20 +65,17 @@ class ViewController: UIViewController, UITextFieldDelegate {
     //returnキーでキーボード閉じる
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
-        //outputText.text = textField.text
         return true
     }
     
     
+
     
-    
-    
-    
-    
-    
-    
-    
-    
+/*
+     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                    ここから，画面の動き
+     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ */
     override func viewDidLoad() {
         //let ud = UserDefaults.standard
        
@@ -98,12 +91,13 @@ class ViewController: UIViewController, UITextFieldDelegate {
         
 
         let graphPoints = ["2月3日", "3月3日", "4月3日", "5月3日", "6月3日", "7月3日", "8月3日"]
-        let graphTaijuDatas = ["100", "94", "80", "89", "81", "72", "80"]
-        let graphSiboDatas = ["40", "100", "38", "1000", "31", "22", "30"]
+        let graphTaijuDatas = ["100", "94", "1000", "89", "1000", "1000", "80"]
+        //let graphTaijuDatas = ["100", "94", "90", "89", "80", "87", "81"]
+        let graphSiboDatas = ["40", "32", "30", "23", "34", "29", "40"]
         var date_length:Int = 0
  
         
-        for i in 0 ... 6{
+        for i in 0 ... graphPoints.count-1{
             ud.set([graphPoints[i],graphTaijuDatas[i],graphSiboDatas[i]], forKey: "\(i)")
             if i == 0{
                 date_length = 0
@@ -111,23 +105,19 @@ class ViewController: UIViewController, UITextFieldDelegate {
                 date_length += 1
             }
         }
+        
 
         if ud.object(forKey: "length") == nil {
             ud.set(date_length,forKey: "length")
         }
         
+
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
     }
     
-    
-    
-    
-    
 
-    
-    
     
     //体重入力
     @IBAction func taiju_in(_ sender: Any) {
@@ -141,7 +131,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
         
         
         //体重入力されてるか？
-        if input_text != nil{
+        if input_text != ""{
             if data_length >= 0{
                 old_data_hairetu = ud.array(forKey: "\(data_length)") as! [String]
                 //今日のデータは入力済みで，更新したいのか？そうでないなら，今日用の新たなキーを作成
@@ -176,20 +166,15 @@ class ViewController: UIViewController, UITextFieldDelegate {
     //体脂肪
     @IBAction func sibo_in(_ sender: Any) {
         let input_text = sibo_text.text
-        //let ud = UserDefaults.standard
-        //var tkiroku = kiroku[dateFormatter.string(from: dt)]
         var data_length = ud.integer(forKey: "length")
 
-      
-        
         
         //ユーザーデフォルトにセット
         var new_data_hairetu:[String] = []
         var old_data_hairetu:[String] = []
         
-        
         //体脂肪入力されてるか？
-        if input_text != nil{
+        if input_text != ""{
             if data_length > 0{
                 old_data_hairetu = ud.array(forKey: "\(data_length)") as! [String]
                 //今日のデータは入力済みで，更新したいのか？そうでないなら，今日用の新たなキーを作成
