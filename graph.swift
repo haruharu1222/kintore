@@ -25,9 +25,6 @@ extension Array where Element: Equatable {
 
 
 class Graph: UIView {
-
-   
-    
     var appDelegate:AppDelegate = UIApplication.shared.delegate as! AppDelegate //AppDelegateのインスタンスを取得
     
     
@@ -48,27 +45,15 @@ class Graph: UIView {
 
     //入力がない
      let notin:CGFloat = 1000
-    /*
-     データの値が１０００だった場合，入力されていないとして，その部分はグラフが空白になるようにします．
-     */
+    /* データの値が１０００だった場合，入力されていないとして，その部分はグラフが空白になるようにします．*/
+
     
-    
-    
-    
-    
-    // 保持しているDataの中で最大値と最低値の差を求める
-     var yAxisMax: CGFloat {
-         //return max(graphTaijuDatas.max()!-graphTaijuDatas.min()!,graphSiboDatas.max()!-graphSiboDatas.min()!)
-         var a = graphTaijuDatas
-         var b = graphSiboDatas
-         a.remove(value: notin)
-         b.remove(value: notin)
-         return max(a.max()!+10,b.max()!+10)
-     }
+
 
      //グラフ横幅を算出
      func checkWidth() -> CGFloat{
-         return CGFloat(graphPoints.count-1) * memoriMargin + (circleWidth * 2) + (firstpoint_memori * 2)
+        //return CGFloat(graphPoints.count-1) * memoriMargin + (circleWidth * 2) + (firstpoint_memori * 2)
+         return CGFloat(graphPoints.count) * memoriMargin + (circleWidth * 2) + (firstpoint_memori * 2)
      }
 
      //グラフ縦幅を算出
@@ -81,18 +66,43 @@ class Graph: UIView {
     {
         let ud = UserDefaults.standard
 
-
-        for i in 0...ud.integer(forKey: "length") {
-            let data_hairetu = ud.array(forKey: "\(i)") as! [String]
-            graphPoints += [data_hairetu[0]]
-            graphTaijuDatas += [CGFloat(Int(atof(data_hairetu[1])))]
-            graphSiboDatas += [CGFloat(Int(atof(data_hairetu[2])))]
+        
+        if ud.integer(forKey: "length") != -1{
+            for i in 0...ud.integer(forKey: "length") {
+                let data_hairetu = ud.array(forKey: "\(i)") as! [String]
+                graphPoints += [data_hairetu[0]]
+                graphTaijuDatas += [CGFloat(Int(atof(data_hairetu[1])))]
+                graphSiboDatas += [CGFloat(Int(atof(data_hairetu[2])))]
+            }
         }
     
         
         GraphFrame()
         MemoriGraphDraw()
     }
+    
+
+    
+    // 保持しているDataの中で最大値と最低値の差を求める
+     var yAxisMax: CGFloat {
+         //return max(graphTaijuDatas.max()!-graphTaijuDatas.min()!,graphSiboDatas.max()!-graphSiboDatas.min()!)
+        var a:[CGFloat] = graphTaijuDatas
+        var b:[CGFloat] = graphSiboDatas
+         a.remove(value: notin)
+         b.remove(value: notin)
+        if a.max()==nil && b.max() == nil{
+            return 100
+        }else if a.max()==nil{
+            return b.max()! + 10
+        }else if b.max()==nil{
+            return a.max()! + 10
+        }else{
+            return max(a.max()! + 10, b.max()! + 10)
+        }
+        //return max(graphTaijuDatas.max()! + 10, graphSiboDatas.max()! + 10)
+     }
+    
+    
 
     //グラフを描画するviewの大きさ
     func GraphFrame(){
@@ -123,7 +133,7 @@ class Graph: UIView {
             }
 
             //最後のラベル
-            if Int(count+1) == graphPoints.count{
+            if Int(count+1) == graphPoints.count && Int(count) != 0{
                 lebelX = (count * memoriMargin)-rect.width + firstpoint_memori * 2
             }
 
@@ -173,7 +183,7 @@ class Graph: UIView {
                 var nowY_taiju: CGFloat = datapoint/yAxisMax * (graphHeight - circleWidth)
                 nowY_taiju = graphHeight - nowY_taiju
 
-                if(graphTaijuDatas.min()!<0){
+                if graphTaijuDatas.min()! < 0 {
                     nowY_taiju = (datapoint - graphTaijuDatas.min()!)/yAxisMax * (graphHeight - circleWidth)
                     nowY_taiju = graphHeight - nowY_taiju
                 }
@@ -214,6 +224,22 @@ class Graph: UIView {
                 //体重のための円をつくる
                 circlePoint = CGPoint(x: (count_taiju+1) * memoriMargin + firstpoint_memori, y: nextY_taiju)
                 myCircle_taiju = UIBezierPath(arcCenter: circlePoint, radius: circleWidth, startAngle: 0.0, endAngle: CGFloat(Double.pi*2), clockwise: false)
+                circleColor_taiju.setFill()
+                myCircle_taiju.fill()
+                myCircle_taiju.stroke()
+                
+            }else if graphTaijuDatas.count == 1{
+                var nowY_taiju: CGFloat = datapoint/yAxisMax * (graphHeight - circleWidth)
+                nowY_taiju = graphHeight - nowY_taiju
+
+                if graphTaijuDatas.min()! < 0 {
+                    nowY_taiju = (datapoint - graphTaijuDatas.min()!)/yAxisMax * (graphHeight - circleWidth)
+                    nowY_taiju = graphHeight - nowY_taiju
+                }
+                var circlePoint:CGPoint = CGPoint()
+                linePath_taiju.move(to: CGPoint(x: count_taiju * memoriMargin + circleWidth + firstpoint_memori, y: nowY_taiju))
+                circlePoint = CGPoint(x: count_taiju * memoriMargin + circleWidth + firstpoint_memori, y: nowY_taiju)
+                myCircle_taiju = UIBezierPath(arcCenter: circlePoint,radius: circleWidth,startAngle: 0.0,endAngle: CGFloat(Double.pi*2),clockwise: false)
                 circleColor_taiju.setFill()
                 myCircle_taiju.fill()
                 myCircle_taiju.stroke()
@@ -293,6 +319,21 @@ class Graph: UIView {
                 circleColor_sibo.setFill()
                 myCircle_sibo.fill()
                 myCircle_sibo.stroke()
+            }else if graphSiboDatas.count == 1{
+                var nowY_sibo: CGFloat = datapoint/yAxisMax * (graphHeight - circleWidth)
+                nowY_sibo = graphHeight - nowY_sibo
+
+                if(graphTaijuDatas.min()!<0){
+                    nowY_sibo = (datapoint - graphSiboDatas.min()!)/yAxisMax * (graphHeight - circleWidth)
+                    nowY_sibo = graphHeight - nowY_sibo
+                }
+                var circlePoint:CGPoint = CGPoint()
+                    linePath_sibo.move(to: CGPoint(x: count_sibo * memoriMargin + circleWidth + firstpoint_memori, y: nowY_sibo))
+                    circlePoint = CGPoint(x: count_sibo * memoriMargin + circleWidth + firstpoint_memori, y: nowY_sibo)
+                    myCircle_sibo = UIBezierPath(arcCenter: circlePoint,radius: circleWidth,startAngle: 0.0,endAngle: CGFloat(Double.pi*2),clockwise: false)
+                    circleColor_sibo.setFill()
+                    myCircle_sibo.fill()
+                    myCircle_sibo.stroke()
             }
 
             count_sibo += 1

@@ -81,12 +81,15 @@ class ViewController: UIViewController, UITextFieldDelegate {
         taiju_text.delegate = self
         sibo_text.delegate = self
         
+
 /*
+        //ユーザーデフォルトをリセット
         for i in 0...10{
             UserDefaults.standard.removeObject(forKey: "\(i)")
         }
         UserDefaults.standard.removeObject(forKey: "length")
  */
+
         
         
         dateFormatter.dateFormat = DateFormatter.dateFormat(fromTemplate: "MMMd", options: 0, locale: Locale(identifier: "ja_JP"))
@@ -121,13 +124,13 @@ class ViewController: UIViewController, UITextFieldDelegate {
         sibo_text.backgroundColor = todayColor
         
 
-        let graphPoints = ["2月3日", "3月3日", "4月3日", "5月3日", "6月3日", "7月3日", "8月3日"]
-        //let graphPoints:[String] = []
-        let graphTaijuDatas = ["100", "94", "1000", "89", "1000", "1000", "80"]
+        //let graphPoints = ["2月3日", "3月3日", "4月3日", "5月3日", "6月3日", "7月3日", "8月3日"]
+        let graphPoints:[String] = []
+        //let graphTaijuDatas = ["100", "94", "1000", "89", "1000", "1000", "80"]
         //let graphTaijuDatas = ["100", "94", "90", "89", "80", "87", "81"]
-        //let graphTaijuDatas:[String] = []
-        let graphSiboDatas = ["40", "32", "30", "23", "34", "29", "40"]
-        //let graphSiboDatas:[String] = []
+        let graphTaijuDatas:[String] = []
+        //let graphSiboDatas = ["40", "32", "30", "23", "34", "29", "40"]
+        let graphSiboDatas:[String] = []
         var date_length:Int = -1
 
         
@@ -206,7 +209,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
         
         //体脂肪入力されてるか？
         if input_text != ""{
-            if data_length > 0{
+            if data_length >= 0{
                 old_data_hairetu = ud.array(forKey: "\(data_length)") as! [String]
                 //今日のデータは入力済みで，更新したいのか？そうでないなら，今日用の新たなキーを作成
                 if old_data_hairetu[0] == dateFormatter.string(from: dt){
