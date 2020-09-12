@@ -22,6 +22,8 @@ extension UIViewController {
 }
 
 
+// UseDefaultsのインスタンスを生成
+let userDefaults = UserDefaults.standard
 //ユーザーデフォルト
 let ud = UserDefaults.standard
 //ユーザーデフォルトにデータを保存
@@ -41,9 +43,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
 
     let dt = Date()
     let dateFormatter = DateFormatter()
-    
-    // UseDefaultsのインスタンスを生成
-    let userDefaults = UserDefaults.standard
+    let dayofweek = DateFormatter()
     
     //入力がない
     let notin:Int = 1000
@@ -77,39 +77,70 @@ class ViewController: UIViewController, UITextFieldDelegate {
      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
  */
     override func viewDidLoad() {
-        //let ud = UserDefaults.standard
-       
         hideKeyboardWhenTappedAround()
         taiju_text.delegate = self
         sibo_text.delegate = self
         
-        
+/*
+        for i in 0...10{
+            UserDefaults.standard.removeObject(forKey: "\(i)")
+        }
+        UserDefaults.standard.removeObject(forKey: "length")
+ */
         
         
         dateFormatter.dateFormat = DateFormatter.dateFormat(fromTemplate: "MMMd", options: 0, locale: Locale(identifier: "ja_JP"))
         today.text = dateFormatter.string(from: dt)
         
+        
+        dayofweek.dateFormat = DateFormatter.dateFormat(fromTemplate: "EEE", options: 0, locale: Locale.current)
+        //today.text = dayofweek.string(from: dt)
+        
+        var todayColor:UIColor = UIColor(red:0.088,  green:0.501,  blue:0, alpha:1)
+        
+        switch dayofweek.string(from: dt) {
+        case "Sun":
+            todayColor = UIColor(red:1.0,  green:0.388,  blue:0.278, alpha:1)
+        case "Mon":
+            todayColor = UIColor(red:0.941,  green:0.902,  blue:0.549, alpha:1)
+        case "Tue":
+            todayColor = UIColor(red:1.0,  green:0.412,  blue:0.706, alpha:1)
+        case "Wed":
+            todayColor = UIColor(red:0.498,  green:1.0,  blue:0.831, alpha:1)
+        case "Thu":
+            todayColor = UIColor(red:0.973,  green:0.973,  blue:0.973, alpha:1)
+        case "Fri":
+            todayColor = UIColor(red:1.0,  green:0.843,  blue:0, alpha:1)
+        default:
+            todayColor = UIColor(red:0.824,  green:0.706,  blue:0.549, alpha:1)
+        }
+
+        
+        view.backgroundColor = todayColor
+        taiju_text.backgroundColor = todayColor
+        sibo_text.backgroundColor = todayColor
+        
 
         let graphPoints = ["2月3日", "3月3日", "4月3日", "5月3日", "6月3日", "7月3日", "8月3日"]
+        //let graphPoints:[String] = []
         let graphTaijuDatas = ["100", "94", "1000", "89", "1000", "1000", "80"]
         //let graphTaijuDatas = ["100", "94", "90", "89", "80", "87", "81"]
+        //let graphTaijuDatas:[String] = []
         let graphSiboDatas = ["40", "32", "30", "23", "34", "29", "40"]
-        var date_length:Int = 0
- 
+        //let graphSiboDatas:[String] = []
+        var date_length:Int = -1
+
         
-        for i in 0 ... graphPoints.count-1{
-            ud.set([graphPoints[i],graphTaijuDatas[i],graphSiboDatas[i]], forKey: "\(i)")
-            if i == 0{
-                date_length = 0
-            }else{
-                date_length += 1
+        
+        if graphPoints.count != 0{
+            if graphPoints.count != 0{
+                for i in 0 ... graphPoints.count-1{
+                    ud.set([graphPoints[i],graphTaijuDatas[i],graphSiboDatas[i]], forKey: "\(i)")
+                    date_length += 1
+                }
             }
         }
-        
-
-        if ud.object(forKey: "length") == nil {
-            ud.set(date_length,forKey: "length")
-        }
+        ud.set(date_length,forKey: "length")
         
 
         super.viewDidLoad()
